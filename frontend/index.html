@@ -15,6 +15,22 @@
     .header { text-align: center; padding: 36px 0 24px; }
     .header h1 { font-size: 2.2rem; font-weight: 800; }
     .subtitle { color: #888; margin-top: 6px; font-size: 1rem; }
+    .restaurant-banner { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px; font-size: 0.85rem; color: #ccc; }
+    .restaurant-banner span { font-weight: 700; color: #f97316; }
+    .switch-restaurant-btn { background: none; border: 1px solid #444; color: #999; padding: 4px 10px; border-radius: 14px; cursor: pointer; font-size: 0.72rem; }
+    .switch-restaurant-btn:hover { color: #fff; border-color: #666; }
+
+    /* Restaurant picker */
+    .picker-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .picker-card { background: #1a1a1a; border-radius: 20px; padding: 32px; max-width: 420px; width: 100%; text-align: center; }
+    .picker-card h1 { font-size: 1.8rem; margin-bottom: 6px; }
+    .picker-card .subtitle { margin-bottom: 24px; }
+    .picker-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .picker-restaurant { background: #242424; border: 1px solid #333; color: #f0f0f0; padding: 14px; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600; transition: all 0.15s; text-align: left; }
+    .picker-restaurant:hover { border-color: #f97316; background: #2a1800; }
+    .picker-create { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #2a2a2a; padding-top: 20px; text-align: left; }
+    .picker-create input { background: #242424; border: 1px solid #333; color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 0.9rem; min-width: 0; }
+    .picker-create input:focus { outline: none; border-color: #f97316; }
 
     .layout { display: grid; grid-template-columns: 1fr 360px; gap: 28px; align-items: start; }
     @media (max-width: 900px) { .layout { grid-template-columns: 1fr; padding-bottom: 76px; } }
@@ -36,6 +52,9 @@
     .food-emoji { font-size: 1.8rem; line-height: 1; }
     .food-name { font-size: 0.72rem; font-weight: 600; line-height: 1.2; color: #ddd; }
     .check-badge { position: absolute; top: 6px; right: 8px; font-size: 0.7rem; color: #f97316; font-weight: 800; }
+    .food-card.sold-out { opacity: 0.45; cursor: not-allowed; }
+    .food-card.sold-out:hover { background: #242424; border-color: transparent; transform: none; }
+    .sold-out-label { font-size: 0.66rem; font-weight: 700; color: #d03b3b; text-transform: uppercase; letter-spacing: 0.04em; }
 
     /* Stars */
     .star-row { display: flex; align-items: center; gap: 1px; }
@@ -103,6 +122,28 @@
     .upload-result.success { background: rgba(34, 197, 94, 0.12); color: #4ade80; }
     .upload-result.error { background: rgba(239, 68, 68, 0.12); color: #f87171; }
 
+    /* Menu availability ("86 it") */
+    .availability-panel { background: #1a1a1a; border-radius: 16px; padding: 24px; margin-top: 20px; }
+    .availability-panel h2 { font-size: 1.1rem; font-weight: 700; }
+    .availability-hint { font-size: 0.82rem; color: #888; margin-top: 6px; margin-bottom: 16px; }
+    .availability-list { display: flex; flex-direction: column; }
+    .availability-row { display: flex; align-items: center; gap: 12px; padding: 10px 2px; border-bottom: 1px solid #242424; }
+    .availability-row:last-child { border-bottom: none; }
+    .availability-row.sold-out { opacity: 0.6; }
+    .availability-emoji { font-size: 1.25rem; }
+    .availability-name { flex: 1; min-width: 0; font-size: 0.9rem; font-weight: 600; color: #f0f0f0; }
+    .availability-toggle { flex-shrink: 0; background: #242424; border: 1px solid #2f6b3a; color: #4ade80; padding: 7px 14px; border-radius: 20px; cursor: pointer; font-size: 0.78rem; font-weight: 700; transition: all 0.15s; }
+    .availability-toggle:hover { background: #2a2a2a; }
+    .availability-toggle.is-sold-out { border-color: #6b2f2f; color: #d03b3b; }
+    .availability-toggle:disabled { opacity: 0.6; cursor: wait; }
+
+    /* Staff login form */
+    .login-form { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
+    .login-form input { background: #242424; border: 1px solid #333; color: #fff; padding: 11px 14px; border-radius: 10px; font-size: 0.9rem; }
+    .login-form input:focus { outline: none; border-color: #f97316; }
+    .logout-link { background: none; border: none; color: #999; font-size: 0.78rem; text-decoration: underline; cursor: pointer; margin-top: 10px; }
+    .logout-link:hover { color: #fff; }
+
     /* Tab bar */
     .tab-bar { display: flex; gap: 6px; background: #1a1a1a; border-radius: 14px; padding: 6px; margin-bottom: 24px; width: fit-content; }
     .tab-btn { background: transparent; border: none; color: #999; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.15s; }
@@ -144,6 +185,16 @@
     .trend-change.up { color: #0ca30c; }
     .trend-change.down { color: #d03b3b; }
     .trend-change.new { color: #898781; font-weight: 600; }
+
+    /* Frequently-bought-together combos */
+    .combo-list { display: flex; flex-direction: column; }
+    .combo-row { padding: 12px 2px; border-bottom: 1px solid #242424; }
+    .combo-row:last-child { border-bottom: none; }
+    .combo-pair { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.9rem; font-weight: 600; color: #f0f0f0; }
+    .combo-plus { color: #666; font-weight: 700; }
+    .combo-stats { display: flex; align-items: center; gap: 12px; margin-top: 6px; font-size: 0.78rem; }
+    .combo-count { color: #999; }
+    .combo-lift { color: #0ca30c; font-weight: 700; }
 
     /* Mobile (QR-on-phone is the primary way customers reach this app) */
     @media (max-width: 640px) {
@@ -193,11 +244,17 @@
     }
 
     function FoodCard({ item, selected, onToggle }) {
+      const soldOut = item.sold_out;
       return (
-        <button className={`food-card ${selected ? "selected" : ""}`} onClick={onToggle} title={`${item.name} — ${item.purchase_count} orders`}>
+        <button
+          className={`food-card ${selected ? "selected" : ""} ${soldOut ? "sold-out" : ""}`}
+          onClick={soldOut ? undefined : onToggle}
+          disabled={soldOut}
+          title={soldOut ? `${item.name} — sold out` : `${item.name} — ${item.purchase_count} orders`}
+        >
           <span className="food-emoji">{item.emoji}</span>
           <span className="food-name">{item.name}</span>
-          <StarRating value={item.stars} small />
+          {soldOut ? <span className="sold-out-label">Sold Out</span> : <StarRating value={item.stars} small />}
           {selected && <span className="check-badge">✓</span>}
         </button>
       );
@@ -221,7 +278,7 @@
       );
     }
 
-    function UploadPanel({ onUploaded }) {
+    function UploadPanel({ slug, token, onUploaded, onAuthError }) {
       const fileInputRef = React.useRef(null);
       const [status, setStatus] = useState("idle");
       const [result, setResult] = useState(null);
@@ -238,7 +295,12 @@
         formData.append("file", file);
 
         try {
-          const res = await fetch("/api/upload-orders", { method: "POST", body: formData });
+          const res = await fetch(`/api/${slug}/upload-orders`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+            body: formData,
+          });
+          if (res.status === 401) { onAuthError && onAuthError(); return; }
           const data = await res.json();
           if (!res.ok) throw new Error(data.detail || "Upload failed");
           setResult(data);
@@ -272,20 +334,131 @@
       );
     }
 
+    function MenuAvailability({ slug, token, items, onChanged, onAuthError }) {
+      const [busyName, setBusyName] = useState(null);
+
+      const toggle = async (item) => {
+        setBusyName(item.name);
+        try {
+          const res = await fetch(`/api/${slug}/sold-out`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ item_name: item.name, sold_out: !item.sold_out }),
+          });
+          if (res.status === 401) { onAuthError && onAuthError(); return; }
+          await onChanged();
+        } finally {
+          setBusyName(null);
+        }
+      };
+
+      if (!items.length) return null;
+
+      return (
+        <div className="availability-panel">
+          <h2>🍽️ Menu Availability</h2>
+          <p className="availability-hint">Mark an item sold out so customers won't see it as an option — toggle it back the moment it's available again.</p>
+          <div className="availability-list">
+            {items.map(item => (
+              <div key={item.id} className={`availability-row ${item.sold_out ? "sold-out" : ""}`}>
+                <span className="availability-emoji">{item.emoji}</span>
+                <span className="availability-name">{item.name}</span>
+                <button
+                  className={`availability-toggle ${item.sold_out ? "is-sold-out" : ""}`}
+                  onClick={() => toggle(item)}
+                  disabled={busyName === item.name}
+                >
+                  {item.sold_out ? "Sold Out" : "Available"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    function LoginForm({ slug, onLoggedIn }) {
+      const [username, setUsername] = useState("");
+      const [password, setPassword] = useState("");
+      const [error, setError] = useState("");
+      const [busy, setBusy] = useState(false);
+
+      const submit = async (e) => {
+        e.preventDefault();
+        setBusy(true);
+        setError("");
+        try {
+          const res = await fetch(`/api/${slug}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || "Login failed");
+          onLoggedIn(data.token);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setBusy(false);
+        }
+      };
+
+      return (
+        <div className="availability-panel">
+          <h2>🔒 Staff Login</h2>
+          <p className="availability-hint">Log in to upload orders or manage menu availability for this restaurant.</p>
+          <form className="login-form" onSubmit={submit}>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              autoComplete="username"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              autoComplete="current-password"
+            />
+            <button className="upload-btn" type="submit" disabled={busy || !username || !password}>
+              {busy ? "Logging in…" : "Log In"}
+            </button>
+          </form>
+          {error && <div className="upload-result error">{error}</div>}
+        </div>
+      );
+    }
+
     const WINDOW_LABELS = { week: "This Week", month: "This Month", "6months": "Last 6 Months" };
 
-    function TrendsPanel() {
+    function formatChange(item) {
+      if (item.change_pct == null) return { label: "New", cls: "new" };
+      // Past +100% (more than doubled), a raw percentage reads as a huge,
+      // confusing number — "7.7× more" says the same thing more plainly.
+      if (item.change_pct > 100) {
+        const multiplier = item.order_count / item.previous_count;
+        const rounded = Math.round(multiplier * 10) / 10;
+        const m = rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1);
+        return { label: `▲ ${m}× more`, cls: "up" };
+      }
+      const arrow = item.change_pct > 0 ? "▲" : item.change_pct < 0 ? "▼" : "–";
+      return { label: `${arrow} ${Math.abs(item.change_pct)}%`, cls: item.change_pct >= 0 ? "up" : "down" };
+    }
+
+    function TrendsPanel({ slug }) {
       const [window_, setWindow] = useState("month");
       const [items, setItems] = useState([]);
       const [loading, setLoading] = useState(true);
 
       useEffect(() => {
         setLoading(true);
-        fetch(`/api/trends?window=${window_}&top_n=8`)
+        fetch(`/api/${slug}/trends?window=${window_}&top_n=8`)
           .then(r => r.json())
           .then(data => { setItems(data.items || []); })
           .finally(() => setLoading(false));
-      }, [window_]);
+      }, [window_, slug]);
 
       const maxValue = Math.max(
         1,
@@ -325,11 +498,7 @@
               {items.map((item, i) => {
                 const currPct = (item.order_count / maxValue) * 100;
                 const prevPct = (item.previous_count / maxValue) * 100;
-                const isNew = item.change_pct == null;
-                const changeLabel = isNew
-                  ? "New"
-                  : `${item.change_pct > 0 ? "▲" : item.change_pct < 0 ? "▼" : "–"} ${Math.abs(item.change_pct)}%`;
-                const changeClass = isNew ? "new" : item.change_pct >= 0 ? "up" : "down";
+                const { label: changeLabel, cls: changeClass } = formatChange(item);
 
                 return (
                   <div key={item.id} className="trend-row">
@@ -355,7 +524,52 @@
       );
     }
 
-    function App() {
+    function CombosPanel({ slug, refreshKey }) {
+      const [combos, setCombos] = useState([]);
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        setLoading(true);
+        fetch(`/api/${slug}/combos?top_n=8`)
+          .then(r => r.json())
+          .then(data => setCombos(data.combos || []))
+          .finally(() => setLoading(false));
+      }, [refreshKey, slug]);
+
+      return (
+        <div className="trends-panel">
+          <div className="trends-header">
+            <h2>🧩 Frequently Bought Together</h2>
+          </div>
+          <p className="availability-hint">Real pairs from the same order — turn these into combo-meal promos.</p>
+
+          {loading ? (
+            <div className="trends-empty">Loading combos…</div>
+          ) : combos.length === 0 ? (
+            <div className="trends-empty">Not enough order history yet to find reliable pairs.</div>
+          ) : (
+            <div className="combo-list">
+              {combos.map((c, i) => (
+                <div key={i} className="combo-row">
+                  <div className="combo-pair">
+                    <span className="combo-item">{c.item_a.emoji} {c.item_a.name}</span>
+                    <span className="combo-plus">+</span>
+                    <span className="combo-item">{c.item_b.emoji} {c.item_b.name}</span>
+                  </div>
+                  <div className="combo-stats">
+                    <span className="combo-count">{c.together_count} orders together</span>
+                    {c.lift > 1 && <span className="combo-lift">{c.lift}× more likely paired</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function App({ restaurant, onSwitchRestaurant }) {
+      const slug = restaurant.slug;
       const [allItems, setAllItems] = useState([]);
       const [selectedIds, setSelectedIds] = useState([]);
       const [suggestions, setSuggestions] = useState([]);
@@ -364,10 +578,25 @@
       const [uploadVersion, setUploadVersion] = useState(0);
       const [activeTab, setActiveTab] = useState("trends");
       const [suggestionsCollapsed, setSuggestionsCollapsed] = useState(true);
+      const [authToken, setAuthToken] = useState(() => sessionStorage.getItem(`auth:${slug}`));
+
+      useEffect(() => {
+        setAuthToken(sessionStorage.getItem(`auth:${slug}`));
+      }, [slug]);
+
+      const handleLoggedIn = (token) => {
+        sessionStorage.setItem(`auth:${slug}`, token);
+        setAuthToken(token);
+      };
+
+      const handleAuthError = () => {
+        sessionStorage.removeItem(`auth:${slug}`);
+        setAuthToken(null);
+      };
 
       const loadItems = useCallback(() => {
-        return fetch("/api/items").then(r => r.json()).then(data => { setAllItems(data); });
-      }, []);
+        return fetch(`/api/${slug}/items`).then(r => r.json()).then(data => { setAllItems(data); });
+      }, [slug]);
 
       useEffect(() => {
         loadItems().then(() => setInitialLoad(false));
@@ -376,7 +605,7 @@
       const fetchSuggestions = useCallback(async (ids) => {
         setLoading(true);
         try {
-          const res = await fetch("/api/suggest", {
+          const res = await fetch(`/api/${slug}/suggest`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ selected_item_ids: ids, top_n: 6 }),
@@ -386,7 +615,7 @@
         } finally {
           setLoading(false);
         }
-      }, []);
+      }, [slug]);
 
       const toggleItem = (id) => {
         const isAdding = !selectedIds.includes(id);
@@ -419,6 +648,10 @@
           <header className="header">
             <h1>🍽️ Food Suggestor</h1>
             <p className="subtitle">Select items you like — we'll suggest what pairs best</p>
+            <div className="restaurant-banner">
+              <span>{restaurant.name}</span>
+              <button className="switch-restaurant-btn" onClick={onSwitchRestaurant}>Switch restaurant</button>
+            </div>
           </header>
 
           <div className="tab-bar">
@@ -433,9 +666,24 @@
             ))}
           </div>
 
-          {activeTab === "trends" && <TrendsPanel key={uploadVersion} />}
+          {activeTab === "trends" && (
+            <>
+              <TrendsPanel key={uploadVersion} slug={slug} />
+              <CombosPanel refreshKey={uploadVersion} slug={slug} />
+            </>
+          )}
 
-          {activeTab === "upload" && <UploadPanel onUploaded={handleUploaded} />}
+          {activeTab === "upload" && (
+            authToken ? (
+              <>
+                <UploadPanel slug={slug} token={authToken} onUploaded={handleUploaded} onAuthError={handleAuthError} />
+                <MenuAvailability slug={slug} token={authToken} items={allItems} onChanged={loadItems} onAuthError={handleAuthError} />
+                <button className="logout-link" onClick={handleAuthError}>Log out of {restaurant.name}</button>
+              </>
+            ) : (
+              <LoginForm slug={slug} onLoggedIn={handleLoggedIn} />
+            )
+          )}
 
           {activeTab === "order" && (
             <div className="layout">
@@ -479,7 +727,131 @@
       );
     }
 
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    function RestaurantPicker({ onSelect }) {
+      const [restaurants, setRestaurants] = useState([]);
+      const [loading, setLoading] = useState(true);
+      const [newName, setNewName] = useState("");
+      const [newUsername, setNewUsername] = useState("");
+      const [newPassword, setNewPassword] = useState("");
+      const [creating, setCreating] = useState(false);
+      const [error, setError] = useState("");
+
+      useEffect(() => {
+        fetch("/api/restaurants")
+          .then(r => r.json())
+          .then(data => setRestaurants(data))
+          .finally(() => setLoading(false));
+      }, []);
+
+      const canCreate = newName.trim() && newUsername.trim() && newPassword;
+
+      const createAndSelect = async () => {
+        if (!canCreate) return;
+        setCreating(true);
+        setError("");
+        try {
+          const res = await fetch("/api/restaurants", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: newName.trim(), username: newUsername.trim(), password: newPassword }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.detail || "Could not create restaurant");
+          onSelect(data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setCreating(false);
+        }
+      };
+
+      return (
+        <div className="picker-screen">
+          <div className="picker-card">
+            <h1>🍽️ Food Suggestor</h1>
+            <p className="subtitle">Choose a restaurant to view</p>
+
+            {loading ? (
+              <div className="trends-empty">Loading…</div>
+            ) : (
+              <div className="picker-list">
+                {restaurants.map(r => (
+                  <button key={r.slug} className="picker-restaurant" onClick={() => onSelect(r)}>
+                    {r.name}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="picker-create">
+              <p className="availability-hint">New restaurant — sets its staff login too</p>
+              <input
+                type="text"
+                placeholder="Restaurant name"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Staff username"
+                value={newUsername}
+                onChange={e => setNewUsername(e.target.value)}
+                autoComplete="username"
+              />
+              <input
+                type="password"
+                placeholder="Staff password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+                onKeyDown={e => e.key === "Enter" && createAndSelect()}
+              />
+              <button className="upload-btn" onClick={createAndSelect} disabled={creating || !canCreate}>
+                {creating ? "Creating…" : "+ Add Restaurant"}
+              </button>
+              {error && <div className="upload-result error">{error}</div>}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function Root() {
+      const [restaurant, setRestaurant] = useState(null);
+      const [checked, setChecked] = useState(false);
+
+      useEffect(() => {
+        const slug = new URLSearchParams(window.location.search).get("r");
+        if (!slug) { setChecked(true); return; }
+        fetch("/api/restaurants")
+          .then(r => r.json())
+          .then(list => {
+            const match = list.find(r => r.slug === slug);
+            if (match) setRestaurant(match);
+          })
+          .finally(() => setChecked(true));
+      }, []);
+
+      const selectRestaurant = (r) => {
+        setRestaurant(r);
+        const url = new URL(window.location.href);
+        url.searchParams.set("r", r.slug);
+        window.history.pushState({}, "", url);
+      };
+
+      const switchRestaurant = () => {
+        setRestaurant(null);
+        const url = new URL(window.location.href);
+        url.searchParams.delete("r");
+        window.history.pushState({}, "", url);
+      };
+
+      if (!checked) return null;
+      if (!restaurant) return <RestaurantPicker onSelect={selectRestaurant} />;
+      return <App restaurant={restaurant} onSwitchRestaurant={switchRestaurant} />;
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
   </script>
 </body>
 </html>

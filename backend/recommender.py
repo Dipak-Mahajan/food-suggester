@@ -1,4 +1,6 @@
 import datetime
+from collections import Counter
+from itertools import combinations
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from mock_data import generate_sales_data
@@ -76,6 +78,12 @@ class FoodRecommender:
             self.has_dates = False
 
     def _build_matrix(self):
+        if not self.food_map:
+            # No items at all yet (e.g. a brand-new restaurant with nothing
+            # uploaded) — cosine_similarity errors on a 0-sample array.
+            self.matrix = pd.DataFrame()
+            self.similarity = pd.DataFrame()
+            return
         self.matrix = self.orders_df.pivot_table(
             index="order_id", columns="item_id", aggfunc="size", fill_value=0
         )
@@ -107,26 +115,34 @@ class FoodRecommender:
         stars = round(1 + 4 * popularity, 1)
         return {"purchase_count": count, "stars": stars}
 
-    def get_popular_items(self, top_n: int = 6) -> list[dict]:
+    def get_popular_items(self, top_n: int = 6, exclude_names: set = None) -> list[dict]:
         """Return globally most popular items (highest order volume)."""
+        exclude_names = exclude_names or set()
         counts = self._order_count(self.orders_df).sort_values(ascending=False)
         result = []
-        for item_id in counts.index[:top_n]:
-            stats = self.get_item_stats(item_id)
+        for item_id in counts.index:
             food = self.food_map[item_id]
+            if food["name"] in exclude_names:
+                continue
+            stats = self.get_item_stats(item_id)
             result.append({**food, **stats, "reason": None})
+            if len(result) >= top_n:
+                break
         return result
 
-    def get_suggestions(self, selected_item_ids: list[int], top_n: int = 6) -> list[dict]:
+    def get_suggestions(self, selected_item_ids: list[int], top_n: int = 6, exclude_names: set = None) -> list[dict]:
         """Given selected items, suggest similar ones using item-item CF."""
+        exclude_names = exclude_names or set()
         valid_ids = [i for i in selected_item_ids if i in self.similarity.columns]
         if not valid_ids:
-            return self.get_popular_items(top_n)
+            return self.get_popular_items(top_n, exclude_names=exclude_names)
 
         # Average similarity across all selected items
         scores = self.similarity[valid_ids].mean(axis=1)
-        # Exclude already-selected items
-        scores = scores.drop(index=[i for i in valid_ids if i in scores.index], errors="ignore")
+        # Exclude already-selected and sold-out items
+        drop_ids = [i for i in valid_ids if i in scores.index]
+        drop_ids += [i for i in scores.index if self.food_map.get(i, {}).get("name") in exclude_names]
+        scores = scores.drop(index=drop_ids, errors="ignore")
         top_ids = scores.nlargest(top_n).index.tolist()
 
         result = []
@@ -178,3 +194,46 @@ class FoodRecommender:
                 "change_pct": change_pct,
             })
         return result
+
+    def get_frequent_pairs(self, top_n: int = 8, min_together: int = 2, exclude_names: set = None) -> list[dict]:
+        """Item pairs that most often appear on the SAME order — explicit
+        combo candidates, not a similarity score. Also reports lift: how
+        many times more often than chance the pair shows up together
+        (lift > 1 means they're genuinely paired, not just both popular)."""
+        exclude_names = exclude_names or set()
+        total_orders = self.orders_df["order_id"].nunique()
+        if total_orders == 0:
+            return []
+
+        item_order_counts = self.orders_df.groupby("item_id")["order_id"].nunique()
+
+        pair_counts = Counter()
+        for _, group in self.orders_df.groupby("order_id"):
+            item_ids = sorted(set(int(i) for i in group["item_id"].dropna()))
+            for a, b in combinations(item_ids, 2):
+                pair_counts[(a, b)] += 1
+
+        results = []
+        for (a, b), count in pair_counts.items():
+            if count < min_together:
+                continue
+            food_a, food_b = self.food_map.get(a), self.food_map.get(b)
+            if not food_a or not food_b:
+                continue
+            if food_a["name"] in exclude_names or food_b["name"] in exclude_names:
+                continue
+
+            support = count / total_orders
+            expected = (item_order_counts.get(a, 0) / total_orders) * (item_order_counts.get(b, 0) / total_orders)
+            lift = round(support / expected, 2) if expected else 0
+
+            results.append({
+                "item_a": food_a,
+                "item_b": food_b,
+                "together_count": int(count),
+                "support_pct": round(support * 100, 1),
+                "lift": lift,
+            })
+
+        results.sort(key=lambda r: (-r["together_count"], -r["lift"]))
+        return results[:top_n]
