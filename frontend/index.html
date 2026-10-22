@@ -17,7 +17,7 @@
     .subtitle { color: #888; margin-top: 6px; font-size: 1rem; }
 
     .layout { display: grid; grid-template-columns: 1fr 360px; gap: 28px; align-items: start; }
-    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .suggestions-panel { position: static !important; } }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; padding-bottom: 76px; } }
 
     /* Menu panel */
     .menu-panel { background: #1a1a1a; border-radius: 16px; padding: 24px; }
@@ -48,11 +48,35 @@
 
     /* Suggestions panel */
     .suggestions-panel { position: sticky; top: 20px; background: #1a1a1a; border-radius: 16px; padding: 24px; }
-    .suggestions-panel h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; }
+    .suggestions-panel h2 { font-size: 1.1rem; font-weight: 700; }
+    .suggestions-panel-header { display: flex; align-items: center; justify-content: space-between; cursor: default; }
+    .suggestions-toggle-icon { display: none; }
+    .suggestions-panel-body { margin-top: 18px; }
     .suggestions-list { display: flex; flex-direction: column; gap: 12px; }
     .loading-state { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 40px 0; color: #666; }
     .spinner { width: 32px; height: 32px; border: 3px solid #333; border-top-color: #f97316; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* On mobile, suggestions live in a bottom sheet instead of below the whole
+       menu — otherwise picking an item means scrolling past every category to see it. */
+    @media (max-width: 900px) {
+      .suggestions-panel {
+        position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+        border-radius: 18px 18px 0 0;
+        box-shadow: 0 -8px 28px rgba(0,0,0,0.5);
+        z-index: 40;
+        max-height: 50vh;
+        display: flex;
+        flex-direction: column;
+        padding: 16px 20px 20px;
+      }
+      .suggestions-panel-header { cursor: pointer; flex-shrink: 0; }
+      .suggestions-panel h2 { font-size: 1rem; }
+      .suggestions-toggle-icon { display: inline-block; font-size: 0.9rem; color: #999; transition: transform 0.2s; }
+      .suggestions-panel.collapsed .suggestions-toggle-icon { transform: rotate(180deg); }
+      .suggestions-panel-body { flex: 1; min-height: 0; overflow-y: auto; }
+      .suggestions-panel.collapsed .suggestions-panel-body { display: none; }
+    }
 
     /* Suggestion card */
     .suggestion-card { display: flex; align-items: flex-start; gap: 10px; background: #242424; border-radius: 12px; padding: 12px 14px; border: 1px solid #2e2e2e; transition: border-color 0.15s; }
@@ -339,6 +363,7 @@
       const [initialLoad, setInitialLoad] = useState(true);
       const [uploadVersion, setUploadVersion] = useState(0);
       const [activeTab, setActiveTab] = useState("trends");
+      const [suggestionsCollapsed, setSuggestionsCollapsed] = useState(true);
 
       const loadItems = useCallback(() => {
         return fetch("/api/items").then(r => r.json()).then(data => { setAllItems(data); });
@@ -364,12 +389,14 @@
       }, []);
 
       const toggleItem = (id) => {
-        const next = selectedIds.includes(id) ? selectedIds.filter(x => x !== id) : [...selectedIds, id];
+        const isAdding = !selectedIds.includes(id);
+        const next = isAdding ? [...selectedIds, id] : selectedIds.filter(x => x !== id);
         setSelectedIds(next);
         fetchSuggestions(next);
+        setSuggestionsCollapsed(isAdding ? false : next.length === 0);
       };
 
-      const clearSelection = () => { setSelectedIds([]); fetchSuggestions([]); };
+      const clearSelection = () => { setSelectedIds([]); fetchSuggestions([]); setSuggestionsCollapsed(true); };
 
       const handleUploaded = useCallback(() => {
         setSelectedIds([]);
@@ -391,7 +418,7 @@
         <div className="app">
           <header className="header">
             <h1>🍽️ Food Suggestor</h1>
-            <p className="subtitle">Select items you like — AI will suggest what pairs best</p>
+            <p className="subtitle">Select items you like — we'll suggest what pairs best</p>
           </header>
 
           <div className="tab-bar">
@@ -429,17 +456,22 @@
                 ))}
               </section>
 
-              <section className="suggestions-panel">
-                <h2>{selectedIds.length === 0 ? "🔥 Popular Right Now" : "✨ AI Suggestions For You"}</h2>
-                {loading ? (
-                  <div className="loading-state"><div className="spinner" /><p>Finding the best pairings…</p></div>
-                ) : (
-                  <div className="suggestions-list">
-                    {suggestions.map((s, i) => (
-                      <SuggestionCard key={s.id} item={s} rank={i + 1} onAdd={() => toggleItem(s.id)} alreadySelected={selectedIds.includes(s.id)} />
-                    ))}
-                  </div>
-                )}
+              <section className={`suggestions-panel ${suggestionsCollapsed ? "collapsed" : ""}`}>
+                <div className="suggestions-panel-header" onClick={() => setSuggestionsCollapsed(c => !c)}>
+                  <h2>{selectedIds.length === 0 ? "🔥 Popular Right Now" : "✨ Suggested For You"}</h2>
+                  <span className="suggestions-toggle-icon">▾</span>
+                </div>
+                <div className="suggestions-panel-body">
+                  {loading ? (
+                    <div className="loading-state"><div className="spinner" /><p>Finding the best pairings…</p></div>
+                  ) : (
+                    <div className="suggestions-list">
+                      {suggestions.map((s, i) => (
+                        <SuggestionCard key={s.id} item={s} rank={i + 1} onAdd={() => toggleItem(s.id)} alreadySelected={selectedIds.includes(s.id)} />
+                      ))}
+                    </div>
+                  )}
+                </div>
               </section>
             </div>
           )}
